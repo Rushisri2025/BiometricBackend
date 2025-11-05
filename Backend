@@ -1,0 +1,39 @@
+# BiometricBackend
+package employeeAttendenceSystem;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+class DBConnector {
+    // Update credentials as needed
+    private static final String URL = "jdbc:mysql://localhost:3306/attendance";
+    private static final String USER = "root";
+    private static final String PASS = "Ayrusis*";  // Replace with your MySQL password
+
+    // Establish database connection
+    public static Connection connect() throws SQLException {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            System.out.println("MySQL Driver not found: " + e.getMessage());
+        }
+        return DriverManager.getConnection(URL, USER, PASS);
+    }
+
+    // Save employee data into database
+    public static void saveEmployee(Employee emp) {
+        try (Connection conn = connect()) {
+            String query = "INSERT INTO employees (id, name, fingerprint_id) VALUES (?, ?, ?)";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, emp.getId());
+            ps.setString(2, emp.getName());
+            ps.setString(3, emp.getFingerprintId());
+            ps.executeUpdate();
+            System.out.println("Employee saved to DB: " + emp.getName());
+        } catch (SQLException e) {
+            System.out.println("Database error: " + e.getMessage());
+        }
+    }
+}
